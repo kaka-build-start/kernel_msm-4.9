@@ -321,6 +321,10 @@ struct msm_otg {
 	struct work_struct extcon_register_work;
 	struct notifier_block psy_nb;
 	bool enable_sdp_check_timer;
+
+#if IS_ENABLED(CONFIG_MACH_MOTOROLA_MSM8937)
+	unsigned int mmi_chg_dcp_icl;
+#endif
 };
 
 struct ci13xxx_platform_data {
