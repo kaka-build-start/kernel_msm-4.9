@@ -1481,4 +1481,6 @@ source "drivers/input/touchscreen/FT5346/Kconfig"
 
 source "drivers/input/touchscreen/ft5336/Kconfig"
 
+source "drivers/input/touchscreen/Atmel308U/Kconfig"
+
 endif
