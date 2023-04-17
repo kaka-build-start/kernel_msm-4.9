@@ -317,6 +317,9 @@ static int64_t of_batterydata_convert_battery_id_kohm(int batt_id_uv,
 	return resistor_value_kohm;
 }
 
+char of_batterydata_best_battery_name[100] = "Unknown";
+EXPORT_SYMBOL(of_batterydata_best_battery_name);
+
 struct device_node *of_batterydata_get_best_profile(
 		const struct device_node *batterydata_container_node,
 		int batt_id_kohm, const char *batt_type)
@@ -419,10 +422,13 @@ skip_check_id:
 
 	rc = of_property_read_string(best_node, "qcom,battery-type",
 							&battery_type);
-	if (!rc)
+	if (!rc) {
 		pr_info("%s found\n", battery_type);
-	else
+		strlcpy(of_batterydata_best_battery_name, battery_type, sizeof(of_batterydata_best_battery_name));
+	} else {
 		pr_info("%s found\n", best_node->name);
+		strlcpy(of_batterydata_best_battery_name, best_node->name, sizeof(of_batterydata_best_battery_name));
+	}
 
 	return best_node;
 }
