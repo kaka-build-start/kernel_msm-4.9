@@ -36,7 +36,6 @@
 #include <linux/power_supply.h>
 
 #include <linux/wakelock.h>
-#include <linux/hardware_info.h>
 
 
 #define _SMB358_MASK(BITS, POS) \
@@ -2727,7 +2726,6 @@ static int smb_parse_dt_battery(struct smb358_charger *chip)
 		of_property_read_string(profile_node, "qcom,battery-type", &chip->battery_type);
 	else {
 		chip->battery_type = default_batt_type;
-		hardwareinfo_set_prop(HARDWARE_BATTERY_ID, chip->battery_type);
 	}
 	dev_err(chip->dev, "found battery type is %s\n", chip->battery_type);
 
