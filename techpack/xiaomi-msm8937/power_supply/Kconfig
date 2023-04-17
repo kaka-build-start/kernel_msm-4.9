@@ -1,6 +1,8 @@
 menu "Power supply"
 	depends on POWER_SUPPLY
 
+source "techpack/xiaomi-msm8937/power_supply/bq2560x/Kconfig"
+source "techpack/xiaomi-msm8937/power_supply/bq27426/Kconfig"
 source "techpack/xiaomi-msm8937/power_supply/qcom/Kconfig"
 
 endmenu
