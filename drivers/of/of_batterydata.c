@@ -317,10 +317,6 @@ static int64_t of_batterydata_convert_battery_id_kohm(int batt_id_uv,
 	return resistor_value_kohm;
 }
 
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
-int of_batterydata_batt_id_kohm_override = -1;
-#endif
-
 struct device_node *of_batterydata_get_best_profile(
 		const struct device_node *batterydata_container_node,
 		int batt_id_kohm, const char *batt_type)
@@ -400,13 +396,6 @@ struct device_node *of_batterydata_get_best_profile(
 				break;
 			}
 		}
-	}
-#endif
-
-#if IS_ENABLED(CONFIG_MACH_XIAOMI_MSM8937)
-	if (xiaomi_msm8937_mach_get() && of_batterydata_batt_id_kohm_override) {
-		pr_info("%s: Override batt_id_kohm: %d\n", __func__, of_batterydata_batt_id_kohm_override);
-		batt_id_kohm = of_batterydata_batt_id_kohm_override;
 	}
 #endif
 
