@@ -37,6 +37,7 @@
 
 #include <linux/pm_wakeup.h>
 
+#include <xiaomi-msm8937/power_supply_legacy.h>
 
 #define _SMB358_MASK(BITS, POS) \
 	((unsigned char)(((1 << (BITS)) - 1) << (POS)))
