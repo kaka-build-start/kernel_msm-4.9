@@ -1,2 +1,2 @@
-obj-y += stub/ xiaomi-msm8937/
-header-y += stub/include/uapi/ xiaomi-msm8937/include/uapi/
+obj-y += stub/ xiaomi-msm8937/ audio-legacy/
+header-y += stub/include/uapi/ xiaomi-msm8937/include/uapi/ audio-legacy/include/uapi/
