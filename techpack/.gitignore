@@ -2,9 +2,12 @@
 */*
 !/audio/*
 !/stub/*
-# Xiaomi MSM8937
+# MSM8937
 /audio-legacy
 /camera-legacy*
+# Motorola MSM8937
+/motorola-msm8937
+# Xiaomi MSM8937
 /xiaomi-msm8937
 /xiaomi-sdm439
 # Mods
