@@ -597,6 +597,15 @@ dtb-$(CONFIG_ARCH_MSM8917) += msm8917-pmi8950-mtp.dtb \
 	msm8917-pmi8940-cdp.dtb \
 	msm8917-pmi8940-rcm.dtb
 
+dtb-$(CONFIG_ARCH_MSM8920) += msm8920-pmi8937-cdp.dtb \
+	msm8920-pmi8937-mtp.dtb \
+	msm8920-pmi8950-cdp.dtb \
+	msm8920-pmi8950-mtp.dtb \
+	msm8920-pmi8937-rcm.dtb \
+	msm8920-pmi8950-rcm.dtb \
+	msm8920-pmi8940-qrd-sku7.dtb \
+	msm8920-pmi8950-ext-codec-cdp.dtb
+
 dtb-$(CONFIG_ARCH_QM215) += qm215-qrd.dtb \
 	qcm2150-qrd.dtb
 dtb-$(CONFIG_ARCH_QM215) += qm215-qrd-smb1360.dtb
