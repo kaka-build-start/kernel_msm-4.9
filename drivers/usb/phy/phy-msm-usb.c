@@ -2155,6 +2155,7 @@ static int msm_otg_set_host(struct usb_otg *otg, struct usb_bus *host)
 
 	if (host) {
 		vbus_otg = devm_regulator_get(motg->phy.dev, "vbus_otg");
+
 		if (IS_ERR(vbus_otg)) {
 			msm_otg_dbg_log_event(&motg->phy,
 					"UNABLE TO GET VBUS_OTG",
@@ -3340,17 +3341,24 @@ static int msm_otg_dpdm_regulator_enable(struct regulator_dev *rdev)
 {
 	int ret = 0;
 	struct msm_otg *motg = rdev_get_drvdata(rdev);
+	struct usb_phy *phy = &motg->phy;
 
 	if (!motg->rm_pulldown) {
+		msm_otg_dbg_log_event(&motg->phy, "Disable Pulldown",
+				      motg->rm_pulldown, 0);
 		ret = msm_hsusb_ldo_enable(motg, USB_PHY_REG_3P3_ON);
-		if (!ret) {
-			motg->rm_pulldown = true;
-			msm_otg_dbg_log_event(&motg->phy, "RM Pulldown",
-					motg->rm_pulldown, 0);
-		}
-	}
+		if (ret)
+			return ret;
 
-	msm_otg_set_mode_nondriving(motg, true);
+		motg->rm_pulldown = true;
+		/* Don't reset h/w if previous disconnect handling is pending */
+		if (phy->otg->state == OTG_STATE_B_IDLE ||
+		    phy->otg->state == OTG_STATE_UNDEFINED)
+			msm_otg_set_mode_nondriving(motg, true);
+		else
+			msm_otg_dbg_log_event(&motg->phy, "NonDrv err",
+					      motg->rm_pulldown, 0);
+	}
 
 	return ret;
 }
@@ -3359,16 +3367,21 @@ static int msm_otg_dpdm_regulator_disable(struct regulator_dev *rdev)
 {
 	int ret = 0;
 	struct msm_otg *motg = rdev_get_drvdata(rdev);
-
-	msm_otg_set_mode_nondriving(motg, false);
+	struct usb_phy *phy = &motg->phy;
 
 	if (motg->rm_pulldown) {
+		/* Let sm_work handle it if USB core is active */
+		if (phy->otg->state == OTG_STATE_B_IDLE ||
+		    phy->otg->state == OTG_STATE_UNDEFINED)
+			msm_otg_set_mode_nondriving(motg, false);
+
 		ret = msm_hsusb_ldo_enable(motg, USB_PHY_REG_3P3_OFF);
-		if (!ret) {
-			motg->rm_pulldown = false;
-			msm_otg_dbg_log_event(&motg->phy, "RM Pulldown",
-					motg->rm_pulldown, 0);
-		}
+		if (ret)
+			return ret;
+
+		motg->rm_pulldown = false;
+		msm_otg_dbg_log_event(&motg->phy, "EN Pulldown",
+				      motg->rm_pulldown, 0);
 	}
 
 	return ret;
