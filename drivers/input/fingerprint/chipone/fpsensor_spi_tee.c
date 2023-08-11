@@ -28,7 +28,9 @@
 
 #define FPSENSOR_SPI_VERSION              "fpsensor_spi_tee_qcomm_v1.22.1"
 #define FP_NOTIFY                         1
+/**/
 #define FPSENSOR_USE_QCOM_POWER_GPIO      1
+/**/
 #define FP_NAV_OFF_BLANKOFF               0
 extern char fp_info[40];
 /* debug log setting */

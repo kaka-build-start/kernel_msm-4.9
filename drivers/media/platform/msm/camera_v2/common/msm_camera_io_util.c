@@ -24,7 +24,6 @@
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
-#define MY_CDBG(fmt, args...) pr_info(fmt, ##args)
 
 void msm_camera_io_w(u32 data, void __iomem *addr)
 {
@@ -746,13 +745,11 @@ vreg_set_voltage_fail:
 vreg_get_fail:
 	return -ENODEV;
 }
-extern unsigned depth_camera_id;
-extern unsigned rear_cam_avdd;
-extern uint16_t sensor_addr_self;
+
 int msm_camera_request_gpio_table(struct gpio *gpio_tbl, uint8_t size,
 	int gpio_en)
 {
-	int rc = 0, i = 0, err = 0;
+	int rc = 0, i = 0, j = 0, err = 0;
 
 	if (!gpio_tbl || !size) {
 		pr_err("%s:%d invalid gpio_tbl %pK / size %d\n", __func__,
@@ -760,32 +757,36 @@ int msm_camera_request_gpio_table(struct gpio *gpio_tbl, uint8_t size,
 		return -EINVAL;
 	}
 	for (i = 0; i < size; i++) {
-		if((rear_cam_avdd == 1) && (sensor_addr_self == 0x2e) && (gpio_tbl[i].gpio == 41)) //huangguoyong.wt,2020.02.19,modify criteria judgement standard
-			size -= 1;
-		MY_CDBG("lxy %s:%d i %d, gpio %d dir %ld, size %d\n", __func__, __LINE__, i,
-			gpio_tbl[i].gpio, gpio_tbl[i].flags, size);
+		CDBG("%s:%d i %d, gpio %d dir %ld\n", __func__, __LINE__, i,
+			gpio_tbl[i].gpio, gpio_tbl[i].flags);
 	}
 	if (gpio_en) {
-		for (i = 0; i < size; i++) {
-			err = gpio_request_one(gpio_tbl[i].gpio,
-				gpio_tbl[i].flags, gpio_tbl[i].label);
-			if (err) {
-				/*
-				 * After GPIO request fails, contine to
-				 * apply new gpios, outout a error message
-				 * for driver bringup debug
-				 */
-				pr_err("%s:%d gpio %d:%s request fails\n",
-					__func__, __LINE__,
-					gpio_tbl[i].gpio, gpio_tbl[i].label);
+		// Both rear and front camera use the same GPIO25 as VDIG pin,
+		// try more times if fail to set gpio25.
+		for (j = 0; j < 5; j++) {
+			for (i = 0; i < size; i++) {
+				err = gpio_request_one(gpio_tbl[i].gpio,
+					gpio_tbl[i].flags, gpio_tbl[i].label);
+				if (err) {
+					/*
+					 * After GPIO request fails, contine to
+					 * apply new gpios, outout a error message
+					 * for driver bringup debug
+					 */
+					pr_err("%s:%d gpio %d:%s request fails j = %d\n",
+						__func__, __LINE__,
+						gpio_tbl[i].gpio, gpio_tbl[i].label, j);
+					break;
+				}
 			}
-                        if(!strcmp(gpio_tbl[i].label,"CAM_STANDBY1"))
-				depth_camera_id = gpio_tbl[i].gpio;
+			if( i == size) {
+				CDBG("%s: j = %d qpio request success.", __func__, j);
+				return rc;
+ 			}
+			msleep(20);
 		}
 	} else {
 		gpio_free_array(gpio_tbl, size);
-		if(sensor_addr_self != 0x2e) //rear camera
-			rear_cam_avdd = 0;
 	}
 	return rc;
 }
